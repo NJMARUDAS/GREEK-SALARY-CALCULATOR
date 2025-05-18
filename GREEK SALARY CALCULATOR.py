@@ -60,7 +60,8 @@ labels = {
 # Language selector with flags in selection only
 lang = st.radio(
     "Language / Γλώσσα",
-    options=['en', 'el'],
+    options=['el', 'en'],
+    index=0,  # 0 means 'el' is selected by default
     format_func=lambda x: f"{labels[x]['flag']} {x.upper()}"
 )
 L = labels[lang]
