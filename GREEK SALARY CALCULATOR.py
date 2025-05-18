@@ -5,17 +5,19 @@ def calculate_contributions(gross_annual):
     MONTHLY_CAP = 7572.62  # 2025 cap
     ANNUAL_CAP = MONTHLY_CAP * 12
     capped_base = min(gross_annual, ANNUAL_CAP)
+    total_contributions = capped_base * 0.1337  # 13.37%
     contributions = {
-        'Primary Pension (6.67%)': capped_base * 0.0667,
-        'Health Care (2.05%)': capped_base * 0.0205,
-        'Health in Benefit (0.40%)': capped_base * 0.004,
-        'Supplementary Insurance (3.00%)': capped_base * 0.03,
-        'Unemployment (1.25%)': capped_base * 0.0125
+        'Social Security (13.37%)': total_contributions
     }
-    total_contributions = sum(contributions.values())
     return total_contributions, contributions
 
 def calculate_income_tax(taxable_income, moving_residency=False):
+    # Apply 50% exemption if moving residency
+    if moving_residency:
+        taxable_income_for_tax = taxable_income * 0.5
+    else:
+        taxable_income_for_tax = taxable_income
+
     brackets = [
         (10000, 0.09),
         (20000, 0.22),
@@ -23,11 +25,6 @@ def calculate_income_tax(taxable_income, moving_residency=False):
         (40000, 0.36),
         (float('inf'), 0.44)
     ]
-    if moving_residency:
-        taxable_income_for_tax = taxable_income * 0.5
-    else:
-        taxable_income_for_tax = taxable_income
-
     tax = 0
     previous_limit = 0
     for limit, rate in brackets:
