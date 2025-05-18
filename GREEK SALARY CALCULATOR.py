@@ -70,7 +70,7 @@ def calculate_contributions(gross_annual):
     MONTHLY_CAP = 7572.62  # 2025 cap
     ANNUAL_CAP = MONTHLY_CAP * 12
     capped_base = min(gross_annual, ANNUAL_CAP)
-    total_contributions = capped_base * 0.1337  # 13.37%
+    total_contributions = capped_base * 0.1337  # 13.37% employee contribution
     contributions = {
         L['social_security_label'] + " (13.37%)": total_contributions
     }
@@ -110,11 +110,11 @@ moving_residency = st.checkbox(
 )
 
 if gross_annual > 0:
-    # Calculate contributions
+    # Social security is always calculated on gross_annual, with cap and rate unchanged by tax residency
     total_contributions, contributions = calculate_contributions(gross_annual)
     taxable_income = gross_annual - total_contributions
 
-    # Calculate taxes
+    # Income tax (may be reduced by moving residency)
     income_tax, taxable_income_for_tax = calculate_income_tax(taxable_income, moving_residency)
     total_tax = income_tax
 
@@ -151,7 +151,7 @@ if gross_annual > 0:
     else:
         colors = ['#4CAF50', '#F44336', '#2196F3']
 
-    # --- Show percentage in "Φόρος Εισοδήματος" label when Greek is selected ---
+    # Show percentage in "Φόρος Εισοδήματος" label when Greek is selected
     if lang == 'el':
         total = sum(values)
         try:
