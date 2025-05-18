@@ -57,11 +57,11 @@ labels = {
     }
 }
 
-# Language selector with flags in selection only
+# Language selector with Greek as default
 lang = st.radio(
     "Language / Γλώσσα",
     options=['el', 'en'],
-    index=0,  # 0 means 'el' is selected by default
+    index=0,  # Greek is default
     format_func=lambda x: f"{labels[x]['flag']} {x.upper()}"
 )
 L = labels[lang]
@@ -156,9 +156,11 @@ if gross_annual > 0:
         values=values,
         marker=dict(colors=colors),
         textinfo='label+percent',
-        insidetextorientation='auto'
+        textposition='outside',  # Labels outside the pie for readability
+        insidetextorientation='auto',
+        textfont_size=16
     )])
-    fig.update_layout(margin=dict(t=0, b=0, l=0, r=0), height=350)
+    fig.update_layout(margin=dict(t=0, b=0, l=0, r=0), height=420)
     st.plotly_chart(fig, use_container_width=True)
 
 # --- Footer ---
