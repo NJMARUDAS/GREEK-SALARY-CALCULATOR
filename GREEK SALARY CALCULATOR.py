@@ -151,6 +151,16 @@ if gross_annual > 0:
     else:
         colors = ['#4CAF50', '#F44336', '#2196F3']
 
+    # --- Show percentage in "Φόρος Εισοδήματος" label when Greek is selected ---
+    if lang == 'el':
+        total = sum(values)
+        try:
+            idx = labels_pie.index("Φόρος Εισοδήματος")
+            percent = values[idx] / total * 100
+            labels_pie[idx] = f"Φόρος Εισοδήματος ({percent:.1f}%)"
+        except ValueError:
+            pass
+
     fig = go.Figure(data=[go.Pie(
         labels=labels_pie,
         values=values,
@@ -161,7 +171,7 @@ if gross_annual > 0:
         textfont_size=16
     )])
     fig.update_layout(
-        margin=dict(t=0, b=0, l=120, r=0),  # Move chart to the right
+        margin=dict(t=0, b=0, l=220, r=0),  # Move chart further right
         height=360
     )
     st.plotly_chart(fig, use_container_width=True)
