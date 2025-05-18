@@ -1,18 +1,77 @@
 import streamlit as st
 import plotly.graph_objects as go
 
+# Language dictionaries
+labels = {
+    'en': {
+        'flag': '🇬🇧',
+        'title': 'Greek Salary Calculator (12 or 14 Payments)',
+        'gross_annual': 'Annual Gross Salary (€):',
+        'payments': 'Number of salary payments per year:',
+        'moving_residency': 'Moving Tax Residency',
+        'moving_help': "50% income tax exemption on Greek-source employment income",
+        'summary': 'Summary',
+        'gross': 'Gross Annual Salary',
+        'net_annual': 'Net Annual Salary',
+        'net_monthly': 'Net Salary per Payment',
+        'tax_details': 'Tax Details',
+        'tax_mode': '⚠️ Tax Residency Mode: 50% income tax exemption applied',
+        'taxable_after_exemption': 'Taxable Income After Exemption',
+        'income_tax': 'Total Income Tax',
+        'social_security': 'Social Security Deduction',
+        'total_social_security': 'Total Social Security',
+        'income_distribution': 'Income Distribution',
+        'net_pay': 'Net Pay',
+        'income_tax_label': 'Income Tax',
+        'social_security_label': 'Social Security',
+        'exempted_income': 'Exempted Income',
+        'footer': 'NJM 2025'
+    },
+    'el': {
+        'flag': '🇬🇷',
+        'title': 'Υπολογιστής Μισθού Ελλάδας (12 ή 14 Πληρωμές)',
+        'gross_annual': 'Ετήσιος Μικτός Μισθός (€):',
+        'payments': 'Αριθμός πληρωμών ανά έτος:',
+        'moving_residency': 'Μεταφορά Φορολογικής Κατοικίας',
+        'moving_help': "Απαλλαγή 50% από το φόρο εισοδήματος για εισόδημα από εργασία στην Ελλάδα",
+        'summary': 'Σύνοψη',
+        'gross': 'Ετήσιος Μικτός Μισθός',
+        'net_annual': 'Ετήσιος Καθαρός Μισθός',
+        'net_monthly': 'Καθαρός Μισθός ανά Πληρωμή',
+        'tax_details': 'Λεπτομέρειες Φορολογίας',
+        'tax_mode': '⚠️ Καθεστώς Φορολογικής Κατοικίας: Εφαρμόστηκε απαλλαγή 50% από το φόρο εισοδήματος',
+        'taxable_after_exemption': 'Φορολογητέο Εισόδημα μετά την Απαλλαγή',
+        'income_tax': 'Συνολικός Φόρος Εισοδήματος',
+        'social_security': 'Κρατήσεις Κοινωνικής Ασφάλισης',
+        'total_social_security': 'Συνολικές Κρατήσεις Κοινωνικής Ασφάλισης',
+        'income_distribution': 'Κατανομή Εισοδήματος',
+        'net_pay': 'Καθαρές Αποδοχές',
+        'income_tax_label': 'Φόρος Εισοδήματος',
+        'social_security_label': 'Κοινωνική Ασφάλιση',
+        'exempted_income': 'Απαλλασσόμενο Εισόδημα',
+        'footer': 'NJM 2025'
+    }
+}
+
+# Language selector with flags
+lang = st.radio(
+    "Language / Γλώσσα",
+    options=['en', 'el'],
+    format_func=lambda x: f"{labels[x]['flag']} {x.upper()}"
+)
+L = labels[lang]
+
 def calculate_contributions(gross_annual):
     MONTHLY_CAP = 7572.62  # 2025 cap
     ANNUAL_CAP = MONTHLY_CAP * 12
     capped_base = min(gross_annual, ANNUAL_CAP)
     total_contributions = capped_base * 0.1337  # 13.37%
     contributions = {
-        'Social Security (13.37%)': total_contributions
+        L['social_security_label'] + " (13.37%)": total_contributions
     }
     return total_contributions, contributions
 
 def calculate_income_tax(taxable_income, moving_residency=False):
-    # Apply 50% exemption if moving residency
     if moving_residency:
         taxable_income_for_tax = taxable_income * 0.5
     else:
@@ -36,13 +95,13 @@ def calculate_income_tax(taxable_income, moving_residency=False):
             break
     return tax, taxable_income_for_tax
 
-st.title('Greek Salary Calculator (12 or 14 Payments)')
+st.title(f"{L['flag']} {L['title']}")
 
-gross_annual = st.number_input('Annual Gross Salary (€):', min_value=0.0, step=1000.0)
-payment_months = st.selectbox('Number of salary payments per year:', [12, 14], index=1)
+gross_annual = st.number_input(L['gross_annual'], min_value=0.0, step=1000.0)
+payment_months = st.selectbox(L['payments'], [12, 14], index=1)
 moving_residency = st.checkbox(
-    'Moving Tax Residency',
-    help="50% income tax exemption on Greek-source employment income"
+    L['moving_residency'],
+    help=L['moving_help']
 )
 
 if gross_annual > 0:
@@ -60,35 +119,35 @@ if gross_annual > 0:
     total_contributions_monthly = total_contributions / payment_months
 
     # --- Summary at the top ---
-    st.header("Summary")
-    st.write(f"**Gross Annual Salary:** €{gross_annual:,.2f}")
-    st.write(f"**Net Annual Salary:** €{net_annual:,.2f}")
-    st.write(f"**Net Salary per Payment ({payment_months} payments):** €{net_monthly:,.2f}")
+    st.header(L['summary'])
+    st.write(f"**{L['gross']}:** €{gross_annual:,.2f}")
+    st.write(f"**{L['net_annual']}:** €{net_annual:,.2f}")
+    st.write(f"**{L['net_monthly']} ({payment_months}):** €{net_monthly:,.2f}")
 
     # --- Taxes section ---
-    st.subheader("Tax Details")
+    st.subheader(L['tax_details'])
     if moving_residency:
-        st.write("⚠️ **Tax Residency Mode:** 50% income tax exemption applied")
-        st.write(f"**Taxable Income After Exemption:** €{taxable_income_for_tax:,.2f}")
-    st.write(f"**Total Income Tax:** annual €{income_tax:,.2f} | per payment €{income_tax/payment_months:,.2f}")
+        st.write(f"{L['tax_mode']}")
+        st.write(f"**{L['taxable_after_exemption']}:** €{taxable_income_for_tax:,.2f}")
+    st.write(f"**{L['income_tax']}:** annual €{income_tax:,.2f} | per payment €{income_tax/payment_months:,.2f}")
 
     # --- Social Security section ---
-    st.subheader("Social Security Deduction")
-    st.write(f"**Total Social Security:** annual €{total_contributions:,.2f} | per payment €{total_contributions_monthly:,.2f}")
+    st.subheader(L['social_security'])
+    st.write(f"**{L['total_social_security']}:** annual €{total_contributions:,.2f} | per payment €{total_contributions_monthly:,.2f}")
 
     # --- Pie Chart ---
-    st.subheader("Income Distribution")
-    labels = ['Net Pay', 'Income Tax', 'Social Security']
+    st.subheader(L['income_distribution'])
+    labels_pie = [L['net_pay'], L['income_tax_label'], L['social_security_label']]
     values = [net_annual, income_tax, total_contributions]
     if moving_residency:
-        labels.insert(1, 'Exempted Income')
+        labels_pie.insert(1, L['exempted_income'])
         values.insert(1, taxable_income * 0.5)
         colors = ['#4CAF50', '#FFC107', '#F44336', '#2196F3']
     else:
         colors = ['#4CAF50', '#F44336', '#2196F3']
 
     fig = go.Figure(data=[go.Pie(
-        labels=labels,
+        labels=labels_pie,
         values=values,
         marker=dict(colors=colors),
         textinfo='label+percent',
@@ -100,8 +159,6 @@ if gross_annual > 0:
 # --- Footer ---
 st.markdown("<hr style='border:1px solid #bbb;'>", unsafe_allow_html=True)
 st.markdown(
-    "<div style='text-align:center; color:white; font-size:1.5em; margin-top:20px;'>"
-    "NJM 2025"
-    "</div>",
+    f"<div style='text-align:center; color:white; font-size:1.5em; margin-top:20px;'>{L['footer']}</div>",
     unsafe_allow_html=True
 )
