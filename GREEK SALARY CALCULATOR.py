@@ -1,7 +1,6 @@
 import streamlit as st
 import plotly.graph_objects as go
 
-# Language dictionaries
 labels = {
     'en': {
         'flag': '🇬🇧',
@@ -23,7 +22,7 @@ labels = {
         'income_distribution': 'Income Distribution',
         'net_pay': 'Net Pay',
         'income_tax_label': 'Income Tax',
-        'social_security_label': 'Social Security',
+        'social_security_label': 'Social Security (13.37%)',
         'exempted_income': 'Exempted Income',
         'footer': 'NJM 2025',
         'annual': 'annual',
@@ -49,7 +48,7 @@ labels = {
         'income_distribution': 'Κατανομή Εισοδήματος',
         'net_pay': 'Καθαρές Αποδοχές',
         'income_tax_label': 'Φόρος Εισοδήματος',
-        'social_security_label': 'Κοινωνική Ασφάλιση',
+        'social_security_label': 'Κοινωνική Ασφάλιση (13.37%)',
         'exempted_income': 'Απαλλασσόμενο Εισόδημα',
         'footer': 'NJM 2025',
         'annual': 'ετησίως',
@@ -57,22 +56,21 @@ labels = {
     }
 }
 
-# Language selector with Greek as default
 lang = st.radio(
     "Language / Γλώσσα",
     options=['el', 'en'],
-    index=0,  # Greek is default
+    index=0,
     format_func=lambda x: f"{labels[x]['flag']} {x.upper()}"
 )
 L = labels[lang]
 
 def calculate_contributions(gross_annual):
-    MONTHLY_CAP = 7572.62  # 2025 cap
+    MONTHLY_CAP = 7572.62  # 2025 cap[4][8]
     ANNUAL_CAP = MONTHLY_CAP * 12
     capped_base = min(gross_annual, ANNUAL_CAP)
-    total_contributions = capped_base * 0.1337  # 13.37% employee contribution
+    total_contributions = capped_base * 0.1337  # 13.37% employee[2][4]
     contributions = {
-        L['social_security_label'] + " (13.37%)": total_contributions
+        L['social_security_label']: total_contributions
     }
     return total_contributions, contributions
 
@@ -81,7 +79,6 @@ def calculate_income_tax(taxable_income, moving_residency=False):
         taxable_income_for_tax = taxable_income * 0.5
     else:
         taxable_income_for_tax = taxable_income
-
     brackets = [
         (10000, 0.09),
         (20000, 0.22),
@@ -110,33 +107,28 @@ moving_residency = st.checkbox(
 )
 
 if gross_annual > 0:
-    # Social security is always calculated on gross_annual, with cap and rate unchanged by tax residency
+    # Social security always based on gross_annual, up to cap, regardless of tax residency
     total_contributions, contributions = calculate_contributions(gross_annual)
     taxable_income = gross_annual - total_contributions
 
-    # Income tax (may be reduced by moving residency)
+    # Income tax may be reduced by moving residency
     income_tax, taxable_income_for_tax = calculate_income_tax(taxable_income, moving_residency)
-    total_tax = income_tax
 
-    # Net calculations
-    net_annual = taxable_income - total_tax
+    net_annual = taxable_income - income_tax
     net_monthly = net_annual / payment_months
     total_contributions_monthly = total_contributions / payment_months
 
-    # --- Summary at the top ---
     st.header(L['summary'])
     st.write(f"**{L['gross']}:** €{gross_annual:,.2f}")
     st.write(f"**{L['net_annual']}:** €{net_annual:,.2f}")
     st.write(f"**{L['net_monthly']} ({payment_months}):** €{net_monthly:,.2f}")
 
-    # --- Taxes section ---
     st.subheader(L['tax_details'])
     if moving_residency:
         st.write(f"{L['tax_mode']}")
         st.write(f"**{L['taxable_after_exemption']}:** €{taxable_income_for_tax:,.2f}")
     st.write(f"**{L['income_tax']}:** {L['annual']} €{income_tax:,.2f} | {L['per_payment']} €{income_tax/payment_months:,.2f}")
 
-    # --- Social Security section ---
     st.subheader(L['social_security'])
     st.write(f"**{L['total_social_security']}:** {L['annual']} €{total_contributions:,.2f} | {L['per_payment']} €{total_contributions_monthly:,.2f}")
 
@@ -151,34 +143,36 @@ if gross_annual > 0:
     else:
         colors = ['#4CAF50', '#F44336', '#2196F3']
 
-    # Show percentage in "Φόρος Εισοδήματος" label when Greek is selected
+    # Dynamic percentage for Income Tax in Greek
     if lang == 'el':
         total = sum(values)
         try:
             idx = labels_pie.index("Φόρος Εισοδήματος")
             percent = values[idx] / total * 100
-            labels_pie[idx] = f"Φόρος Εισοδήματος ({percent:.1f}%)"
+            labels_pie[idx] = f"Φόρος Εισοδήματος ({percent:.2f}%)"
         except ValueError:
             pass
+        # Social Security label always shows statutory rate (13.37%), not dynamic percentage
 
     fig = go.Figure(data=[go.Pie(
         labels=labels_pie,
         values=values,
         marker=dict(colors=colors),
         textinfo='label+percent',
-        textposition='outside',  # Labels outside for readability
+        textposition='outside',
         insidetextorientation='auto',
         textfont_size=16
     )])
     fig.update_layout(
-        margin=dict(t=0, b=0, l=220, r=0),  # Move chart further right
+        margin=dict(t=0, b=0, l=80, r=0),  # Move chart slightly to the left
         height=360
     )
     st.plotly_chart(fig, use_container_width=True)
 
 # --- Footer ---
-st.markdown("<hr style='border:1px solid #bbb;'>", unsafe_allow_html=True)
+st.markdown("<hr style='border:1px solid #bbb; margin-top: 60px;'>", unsafe_allow_html=True)
 st.markdown(
-    f"<div style='text-align:center; color:white; font-size:1.5em; margin-top:20px;'>{L['footer']}</div>",
+    f"<div style='text-align:center; color:white; font-size:1.5em; margin-top:60px;'>"  # Footer further down
+    f"{L['footer']}</div>",
     unsafe_allow_html=True
 )
