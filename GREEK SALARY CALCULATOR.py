@@ -152,19 +152,19 @@ if gross_annual > 0:
         colors = ['#4CAF50', '#F44336', '#2196F3']
 
     fig = go.Figure(data=[go.Pie(
-    labels=labels_pie,
-    values=values,
-    marker=dict(colors=colors),
-    textinfo='label+percent',
-    textposition='outside',  # Keep labels outside for readability
-    insidetextorientation='auto',
-    textfont_size=16
-)])
-fig.update_layout(
-    margin=dict(t=0, b=0, l=120, r=0),  # Add left margin to move chart right
-    height=360,                         # Restore previous/smaller size
-)
-st.plotly_chart(fig, use_container_width=True)
+        labels=labels_pie,
+        values=values,
+        marker=dict(colors=colors),
+        textinfo='label+percent',
+        textposition='outside',  # Labels outside for readability
+        insidetextorientation='auto',
+        textfont_size=16
+    )])
+    fig.update_layout(
+        margin=dict(t=0, b=0, l=120, r=0),  # Move chart to the right
+        height=360
+    )
+    st.plotly_chart(fig, use_container_width=True)
 
 # --- Footer ---
 st.markdown("<hr style='border:1px solid #bbb;'>", unsafe_allow_html=True)
