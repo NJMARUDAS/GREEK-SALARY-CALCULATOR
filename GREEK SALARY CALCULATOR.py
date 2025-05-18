@@ -73,10 +73,8 @@ if gross_annual > 0:
     st.write(f"**Total Income Tax:** annual €{income_tax:,.2f} | per payment €{income_tax/payment_months:,.2f}")
 
     # --- Social Security section ---
-    st.subheader("Social Security Deductions")
-    for name, amount in contributions.items():
-        st.write(f"- {name}: annual €{amount:,.2f}  |  per payment €{amount/payment_months:,.2f}")
-    st.write(f"**Total Social Security:** annual €{total_contributions:,.2f}  |  per payment €{total_contributions_monthly:,.2f}")
+    st.subheader("Social Security Deduction")
+    st.write(f"**Total Social Security:** annual €{total_contributions:,.2f} | per payment €{total_contributions_monthly:,.2f}")
 
     # --- Pie Chart ---
     st.subheader("Income Distribution")
