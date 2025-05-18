@@ -22,7 +22,7 @@ labels = {
         'income_distribution': 'Income Distribution',
         'net_pay': 'Net Pay',
         'income_tax_label': 'Income Tax',
-        'social_security_label': 'Social Security (13.37%)',
+        'social_security_label': 'Social Security',
         'exempted_income': 'Exempted Income',
         'footer': 'NJM 2025',
         'annual': 'annual',
@@ -48,7 +48,7 @@ labels = {
         'income_distribution': 'Κατανομή Εισοδήματος',
         'net_pay': 'Καθαρές Αποδοχές',
         'income_tax_label': 'Φόρος Εισοδήματος',
-        'social_security_label': 'Κοινωνική Ασφάλιση (13.37%)',
+        'social_security_label': 'Κοινωνική Ασφάλιση',
         'exempted_income': 'Απαλλασσόμενο Εισόδημα',
         'footer': 'NJM 2025',
         'annual': 'ετησίως',
@@ -65,10 +65,10 @@ lang = st.radio(
 L = labels[lang]
 
 def calculate_contributions(gross_annual):
-    MONTHLY_CAP = 7572.62  # 2025 cap[4][8]
+    MONTHLY_CAP = 7572.62  # 2025 cap
     ANNUAL_CAP = MONTHLY_CAP * 12
     capped_base = min(gross_annual, ANNUAL_CAP)
-    total_contributions = capped_base * 0.1337  # 13.37% employee[2][4]
+    total_contributions = capped_base * 0.1337  # 13.37%
     contributions = {
         L['social_security_label']: total_contributions
     }
@@ -143,36 +143,27 @@ if gross_annual > 0:
     else:
         colors = ['#4CAF50', '#F44336', '#2196F3']
 
-    # Dynamic percentage for Income Tax in Greek
-    if lang == 'el':
-        total = sum(values)
-        try:
-            idx = labels_pie.index("Φόρος Εισοδήματος")
-            percent = values[idx] / total * 100
-            labels_pie[idx] = f"Φόρος Εισοδήματος ({percent:.2f}%)"
-        except ValueError:
-            pass
-        # Social Security label always shows statutory rate (13.37%), not dynamic percentage
-
     fig = go.Figure(data=[go.Pie(
         labels=labels_pie,
         values=values,
         marker=dict(colors=colors),
-        textinfo='label+percent',
+        textinfo='percent+label',  # Show percentages and labels on slices
         textposition='outside',
         insidetextorientation='auto',
-        textfont_size=16
+        textfont_size=12,  # Smaller font
+        outsidetextfont_size=12,  # Smaller font
+        showlegend=False  # Remove right-side legend
     )])
     fig.update_layout(
-        margin=dict(t=0, b=0, l=80, r=0),  # Move chart slightly to the left
+        margin=dict(t=0, b=0, l=50, r=0),  # Shift left
         height=360
     )
     st.plotly_chart(fig, use_container_width=True)
 
 # --- Footer ---
-st.markdown("<hr style='border:1px solid #bbb; margin-top: 60px;'>", unsafe_allow_html=True)
+st.markdown("<hr style='border:1px solid #bbb; margin-top: 100px;'>", unsafe_allow_html=True)
 st.markdown(
-    f"<div style='text-align:center; color:white; font-size:1.5em; margin-top:60px;'>"  # Footer further down
+    f"<div style='text-align:center; color:white; font-size:1.5em; margin-top:60px; margin-bottom: 40px;'>"
     f"{L['footer']}</div>",
     unsafe_allow_html=True
 )
