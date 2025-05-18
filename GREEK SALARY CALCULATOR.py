@@ -25,7 +25,9 @@ labels = {
         'income_tax_label': 'Income Tax',
         'social_security_label': 'Social Security',
         'exempted_income': 'Exempted Income',
-        'footer': 'NJM 2025'
+        'footer': 'NJM 2025',
+        'annual': 'annual',
+        'per_payment': 'per payment'
     },
     'el': {
         'flag': '🇬🇷',
@@ -49,11 +51,13 @@ labels = {
         'income_tax_label': 'Φόρος Εισοδήματος',
         'social_security_label': 'Κοινωνική Ασφάλιση',
         'exempted_income': 'Απαλλασσόμενο Εισόδημα',
-        'footer': 'NJM 2025'
+        'footer': 'NJM 2025',
+        'annual': 'ετησίως',
+        'per_payment': 'ανά πληρωμή'
     }
 }
 
-# Language selector with flags
+# Language selector with flags in selection only
 lang = st.radio(
     "Language / Γλώσσα",
     options=['en', 'el'],
@@ -95,7 +99,7 @@ def calculate_income_tax(taxable_income, moving_residency=False):
             break
     return tax, taxable_income_for_tax
 
-st.title(f"{L['flag']} {L['title']}")
+st.title(L['title'])
 
 gross_annual = st.number_input(L['gross_annual'], min_value=0.0, step=1000.0)
 payment_months = st.selectbox(L['payments'], [12, 14], index=1)
@@ -129,11 +133,11 @@ if gross_annual > 0:
     if moving_residency:
         st.write(f"{L['tax_mode']}")
         st.write(f"**{L['taxable_after_exemption']}:** €{taxable_income_for_tax:,.2f}")
-    st.write(f"**{L['income_tax']}:** annual €{income_tax:,.2f} | per payment €{income_tax/payment_months:,.2f}")
+    st.write(f"**{L['income_tax']}:** {L['annual']} €{income_tax:,.2f} | {L['per_payment']} €{income_tax/payment_months:,.2f}")
 
     # --- Social Security section ---
     st.subheader(L['social_security'])
-    st.write(f"**{L['total_social_security']}:** annual €{total_contributions:,.2f} | per payment €{total_contributions_monthly:,.2f}")
+    st.write(f"**{L['total_social_security']}:** {L['annual']} €{total_contributions:,.2f} | {L['per_payment']} €{total_contributions_monthly:,.2f}")
 
     # --- Pie Chart ---
     st.subheader(L['income_distribution'])
